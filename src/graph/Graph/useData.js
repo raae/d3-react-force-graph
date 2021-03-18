@@ -7,8 +7,14 @@ const useData = (data) => {
   useEffect(() => {
     console.log("Update nodes/links");
 
-    nodesRef.current = data.nodes.map((d) => Object.create(d));
-    linksRef.current = data.links.map((d) => Object.create(d));
+    nodesRef.current = data.nodes.map((node) => {
+      const current = nodesRef.current.find((c) => c.id === node.id);
+      return current || node;
+    });
+    linksRef.current = data.links.map((link) => {
+      const current = nodesRef.current.find((c) => c.id === link.id);
+      return current || link;
+    });
   }, [data]);
 
   return {

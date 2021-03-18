@@ -19,19 +19,6 @@ const useSimulation = ({ nodes, links, height, width }) => {
   }, []);
 
   useEffect(() => {
-    console.log("Update nodes and links");
-    simRef.current.nodes(nodes);
-    simRef.current.force(
-      "link",
-      d3
-        .forceLink(links)
-        .id((d) => d.id)
-        .distance(Math.random() * 1000)
-    );
-    restart(0.3);
-  }, [nodes, links, restart]);
-
-  useEffect(() => {
     const stage = d3.select(svgRef.current);
 
     const node = stage.selectAll("circle").data(nodes, function (d) {
@@ -62,6 +49,16 @@ const useSimulation = ({ nodes, links, height, width }) => {
     simRef.current.force("center", d3.forceCenter(width / 2, height / 2));
     restart(0.2);
   }, [width, height, restart]);
+
+  useEffect(() => {
+    console.log("Update nodes and links");
+    simRef.current.nodes(nodes);
+    simRef.current.force(
+      "link",
+      d3.forceLink(links).id((d) => d.id)
+    );
+    restart(0.2);
+  }, [nodes, links, restart]);
 
   return {
     svgRef,

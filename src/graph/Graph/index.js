@@ -1,5 +1,3 @@
-import { useRef, useEffect, useCallback } from "react";
-import * as d3 from "d3";
 import { useGraphDimensions } from "../utils";
 import { useData } from "./useData";
 import { useSimulation } from "./useSimulation";
