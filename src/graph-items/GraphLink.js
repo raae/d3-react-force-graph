@@ -1,4 +1,6 @@
-const GraphLink = ({ id, value }) => {
+import { memo } from "react";
+
+const GraphLink = memo(({ id, value }) => {
   return (
     <line
       id={id}
@@ -7,6 +9,6 @@ const GraphLink = ({ id, value }) => {
       strokeWidth={Math.sqrt(value)}
     />
   );
-};
+});
 
 export { GraphLink };

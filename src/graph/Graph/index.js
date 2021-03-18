@@ -3,7 +3,7 @@ import { useData } from "./useData";
 import { useSimulation } from "./useSimulation";
 
 const Graph = ({ data, children }) => {
-  console.log("Render");
+  console.log("Graph: Render");
 
   const { ref: rootRef, height, width } = useGraphDimensions();
   const { nodes, links } = useData(data);

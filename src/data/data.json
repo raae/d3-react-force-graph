@@ -1398,7 +1398,10 @@
     },
     {
       "group": 2,
-      "id": "Simplice"
+      "id": "Simplice",
+      "fill": "red",
+      "fx": 200,
+      "fy": 100
     },
     {
       "group": 2,
@@ -1446,7 +1449,8 @@
     },
     {
       "group": 5,
-      "id": "Woman2"
+      "id": "Woman2",
+      "fill": "pink"
     },
     {
       "group": 0,
@@ -1562,7 +1566,8 @@
     },
     {
       "group": 5,
-      "id": "Toussaint"
+      "id": "Toussaint",
+      "fill": "purple"
     },
     {
       "group": 10,

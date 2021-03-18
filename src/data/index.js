@@ -8,6 +8,7 @@ export const getData = () => {
         id: `${link.source}-${link.target}`,
       };
     }),
+
     nodes: data.nodes.map((node) => {
       return {
         ...node,
