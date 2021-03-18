@@ -4,7 +4,7 @@ import * as d3 from "d3";
 const useSimulation = ({ nodes, links, height, width }) => {
   console.log("useSimulation: Run", nodes.length);
 
-  const svgRef = useRef();
+  const simElRef = useRef();
   const simRef = useRef();
 
   if (!simRef.current && width !== 0 && height !== 0) {
@@ -15,32 +15,35 @@ const useSimulation = ({ nodes, links, height, width }) => {
     if (simRef.current) {
       updateSimForceCenter(simRef.current, { width, height });
       updateSimData(simRef.current, { nodes, links });
-      syncWithDom(simRef.current, svgRef.current, { nodes, links });
       restartSim(simRef.current, { threshold: 0.3 });
     }
   }, [nodes, links, height, width]);
 
+  if (simRef.current && simElRef.current) {
+    syncWithDom(simRef.current, simElRef.current, { nodes, links });
+  }
+
   return {
-    svgRef,
+    simElRef,
   };
 };
 
 export { useSimulation };
 
 const createSim = () => {
-  console.log("D3Sim: Create");
+  console.log("useSimulation: Create simulation");
   const sim = d3.forceSimulation();
   sim.force("charge", d3.forceManyBody());
   return sim;
 };
 
 const updateSimForceCenter = (sim, { width, height }) => {
-  console.log("D3Sim: Update Force Center");
+  console.log("useSimulation: Update Force Center");
   return sim.force("center", d3.forceCenter(width / 2, height / 2));
 };
 
 const updateSimData = (sim, { nodes, links }) => {
-  console.log("D3Sim: Update Sim Data", nodes.length);
+  console.log("useSimulation: Update Sim Data", nodes.length);
   return sim.nodes(nodes).force(
     "link",
     d3
@@ -58,24 +61,58 @@ const restartSim = (sim, { threshold }) => {
 };
 
 const syncWithDom = (sim, svg, { nodes, links }) => {
-  sim.on("tick", () => {
-    const svgEl = d3.select(svg);
+  console.log("useSimulation: Sync with DOM");
 
-    const node = svgEl.selectAll("circle").data(nodes, function (d) {
-      return (d && d.id) || d3.select(this).attr("id");
-    });
+  const svgEl = d3.select(svg);
 
-    const link = svgEl.selectAll("line").data(links, function (d) {
-      return (d && d.id) || d3.select(this).attr("id");
-    });
+  const d3NodeSelection = svgEl.selectAll("circle").data(nodes, function (d) {
+    return (d && d.id) || d3.select(this).attr("id");
+  });
 
-    link
+  const d3LinkSelection = svgEl.selectAll("line").data(links, function (d) {
+    return (d && d.id) || d3.select(this).attr("id");
+  });
+
+  const updatePositions = () => {
+    d3LinkSelection
+      .attr("opacity", 1)
       .attr("x1", (d) => d.source.x)
       .attr("y1", (d) => d.source.y)
       .attr("x2", (d) => d.target.x)
       .attr("y2", (d) => d.target.y);
 
-    node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+    d3NodeSelection
+      .attr("opacity", 1)
+      .attr("cx", (d) => d.x)
+      .attr("cy", (d) => d.y);
+  };
+
+  const d3Drag = d3.drag().on("start drag end", (event) => {
+    const { dx, dy, subject } = event;
+    const { id } = subject;
+
+    let draggingIds = [id];
+
+    draggingIds.map((draggingId) => {
+      const node = nodes.find((node) => node.id === draggingId);
+
+      if (node) {
+        node.x = node.x + dx;
+        node.y = node.y + dy;
+        node.fx = node.x;
+        node.fy = node.y;
+      }
+
+      return node;
+    });
+
+    updatePositions();
+  });
+
+  d3NodeSelection.call(d3Drag);
+
+  sim.on("tick", () => {
+    updatePositions();
   });
 
   sim.on("end", () => {

@@ -7,7 +7,7 @@ const Graph = ({ data, children }) => {
 
   const { ref: rootRef, height, width } = useGraphDimensions();
   const { nodes, links } = useData(data);
-  const { svgRef } = useSimulation({ nodes, links, width, height });
+  const { simElRef } = useSimulation({ nodes, links, width, height });
 
   return (
     <div
@@ -25,9 +25,10 @@ const Graph = ({ data, children }) => {
           left: 0,
           top: 0,
         }}
+        viewBox={`0 0 ${width} ${height}`}
         width={width}
         height={height}
-        ref={svgRef}
+        ref={simElRef}
       >
         {children}
       </svg>
