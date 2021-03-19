@@ -3,30 +3,17 @@ import { useEffect, useState } from "react";
 import Graph from "../graph";
 import { getData } from "../data";
 import { GraphLink, GraphNode } from "../graph-items";
-import { mapValues } from "lodash";
+
+const EXCLUDE_IDS = ["Woman2", "Simplice", "Toussaint"];
 
 const GraphView = () => {
   console.log("GraphView: Render");
 
   const [data, setData] = useState(getData());
-  const [values, setValues] = useState({
-    Woman2: false,
-    Simplice: true,
-    Toussaint: false,
-  });
+  const [isExclude, setIsExclude] = useState(true);
 
-  const excludeIds = Object.keys(values).filter((key) => values[key]);
-
-  const handleChange = (name) => (event) => {
-    setValues((current) => {
-      return { ...current, [name]: !current[name] };
-    });
-  };
-
-  const handleChangeAll = (checked) => () => {
-    setValues((current) => {
-      return mapValues(current, () => checked);
-    });
+  const handleToggleExclude = () => {
+    setIsExclude((current) => !current);
   };
 
   useEffect(() => {
@@ -36,12 +23,17 @@ const GraphView = () => {
     return () => clearInterval(id);
   }, []);
 
-  const links = data.links.filter(
-    ({ source, target }) =>
-      !excludeIds.includes(source) && !excludeIds.includes(target)
-  );
+  const links = data.links.filter(({ source, target }) => {
+    if (isExclude) {
+      return !EXCLUDE_IDS.includes(source) && !EXCLUDE_IDS.includes(target);
+    } else {
+      return true;
+    }
+  });
 
-  const nodes = data.nodes.filter(({ id }) => !excludeIds.includes(id));
+  const nodes = data.nodes.filter(
+    ({ id }) => !isExclude || !EXCLUDE_IDS.includes(id)
+  );
 
   return (
     <>
@@ -49,20 +41,14 @@ const GraphView = () => {
         <h2>Remove</h2>
         <p></p>
         <p>
-          <button onClick={handleChangeAll(true)}>Remove all</button>{" "}
-          <button onClick={handleChangeAll(false)}>Add all</button>
+          <input
+            id="exclude"
+            type="checkbox"
+            onChange={handleToggleExclude}
+            checked={isExclude}
+          />{" "}
+          <label htmlFor="exclude">Remove some nodes</label>
         </p>
-        {Object.keys(values).map((key) => (
-          <p key={key}>
-            <input
-              type="checkbox"
-              id={key}
-              onChange={handleChange(key)}
-              checked={values[key]}
-            />
-            <label htmlFor={key}>{key}</label>
-          </p>
-        ))}
       </aside>
       <div style={{ height: "50vh" }}>
         <Graph data={{ nodes, links }}>
