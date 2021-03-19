@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { isEqual } from "lodash";
 
-const useData = (data) => {
+export const useData = (data) => {
   console.log("useData: Run", data.nodes.length);
 
   const dataRef = useRef();
@@ -36,5 +36,3 @@ const useData = (data) => {
     links,
   };
 };
-
-export { useData };

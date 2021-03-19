@@ -6,7 +6,7 @@ function App() {
       <header>
         <h1>D3 React Force Layout</h1>
       </header>
-      <main style={{ height: "50vh" }}>
+      <main>
         <GraphView />
       </main>
     </>

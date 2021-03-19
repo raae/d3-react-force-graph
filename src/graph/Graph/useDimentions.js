@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 
-export const useGraphDimensions = () => {
+export const useDimensions = () => {
   const ref = useRef();
 
   const [width, setWidth] = useState(0);

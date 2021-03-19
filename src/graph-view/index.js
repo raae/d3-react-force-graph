@@ -64,15 +64,16 @@ const GraphView = () => {
           </p>
         ))}
       </aside>
-
-      <Graph data={{ nodes, links }}>
-        {links.map((link) => (
-          <GraphLink key={link.id} {...link} />
-        ))}
-        {nodes.map((node) => (
-          <GraphNode key={node.id} {...node} />
-        ))}
-      </Graph>
+      <div style={{ height: "50vh" }}>
+        <Graph data={{ nodes, links }}>
+          {links.map((link) => (
+            <GraphLink key={link.id} {...link} />
+          ))}
+          {nodes.map((node) => (
+            <GraphNode key={node.id} {...node} />
+          ))}
+        </Graph>
+      </div>
     </>
   );
 };

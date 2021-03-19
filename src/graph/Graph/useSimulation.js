@@ -1,23 +1,23 @@
 import { useRef, useEffect } from "react";
 import * as d3 from "d3";
 
-const useSimulation = ({ nodes, links, height, width }) => {
+export const useSimulation = ({ nodes, links, height, width }) => {
   console.log("useSimulation: Run", nodes.length);
 
   const simElRef = useRef();
   const simRef = useRef();
 
-  if (!simRef.current && width !== 0 && height !== 0) {
-    simRef.current = createSim();
-  }
-
   useEffect(() => {
     if (simRef.current) {
-      updateSimForceCenter(simRef.current, { width, height });
       updateSimData(simRef.current, { nodes, links });
       restartSim(simRef.current, { threshold: 0.3 });
     }
-  }, [nodes, links, height, width]);
+  }, [nodes, links]);
+
+  if (!simRef.current) {
+    simRef.current = createSim({ width, height });
+    updateSimData(simRef.current, { nodes, links });
+  }
 
   if (simRef.current && simElRef.current) {
     syncWithDom(simRef.current, simElRef.current, { nodes, links });
@@ -28,8 +28,6 @@ const useSimulation = ({ nodes, links, height, width }) => {
   };
 };
 
-export { useSimulation };
-
 const createSim = () => {
   console.log("useSimulation: Create simulation");
   const sim = d3.forceSimulation();
@@ -37,19 +35,11 @@ const createSim = () => {
   return sim;
 };
 
-const updateSimForceCenter = (sim, { width, height }) => {
-  console.log("useSimulation: Update Force Center");
-  return sim.force("center", d3.forceCenter(width / 2, height / 2));
-};
-
 const updateSimData = (sim, { nodes, links }) => {
   console.log("useSimulation: Update Sim Data", nodes.length);
   return sim.nodes(nodes).force(
     "link",
-    d3
-      .forceLink(links)
-      .id((d) => d.id)
-      .distance(100)
+    d3.forceLink(links).id((d) => d.id)
   );
 };
 
