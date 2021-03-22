@@ -10,18 +10,25 @@ const GraphView = () => {
   console.log("GraphView: Render");
 
   const [data, setData] = useState(getData());
+
+  useEffect(() => {
+    // Faking what would happen when polling an API,
+    // to make sure we handle new (but potentially "equal" data).
+    const id = setInterval(() => {
+      setData(getData());
+    }, 6000);
+    return () => clearInterval(id);
+  }, []);
+
+  // To be able to check if everything works with
+  // changing data I have added the option ot add/remove
+  // three nodes where one even has a fixed position.
+
   const [isExclude, setIsExclude] = useState(true);
 
   const handleToggleExclude = () => {
     setIsExclude((current) => !current);
   };
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setData(getData);
-    }, 6000);
-    return () => clearInterval(id);
-  }, []);
 
   const links = data.links.filter(({ source, target }) => {
     if (isExclude) {
