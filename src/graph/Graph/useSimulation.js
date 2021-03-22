@@ -1,7 +1,9 @@
 import { useRef, useEffect } from "react";
+
 import * as d3 from "d3";
 
-export const useSimulation = ({ nodes, links, height, width }) => {
+export const useSimulation = (props) => {
+  const { nodes, links } = props;
   console.log("useSimulation: Run", nodes.length);
 
   const simElRef = useRef();
@@ -15,12 +17,12 @@ export const useSimulation = ({ nodes, links, height, width }) => {
   }, [nodes, links]);
 
   if (!simRef.current) {
-    simRef.current = createSim({ width, height });
-    updateSimData(simRef.current, { nodes, links });
+    simRef.current = createSim(props);
+    updateSimData(simRef.current, props);
   }
 
   if (simRef.current && simElRef.current) {
-    syncWithDom(simRef.current, simElRef.current, { nodes, links });
+    syncWithDom(simRef.current, simElRef.current, props);
   }
 
   return {
@@ -50,31 +52,24 @@ const restartSim = (sim, { threshold }) => {
   }
 };
 
-const syncWithDom = (sim, svg, { nodes, links }) => {
+const syncWithDom = (sim, svg, { nodes, onPositionsChange }) => {
   console.log("useSimulation: Sync with DOM");
 
   const svgEl = d3.select(svg);
 
-  const d3NodeSelection = svgEl.selectAll("circle").data(nodes, function (d) {
-    return (d && d.id) || d3.select(this).attr("id");
-  });
-
-  const d3LinkSelection = svgEl.selectAll("line").data(links, function (d) {
-    return (d && d.id) || d3.select(this).attr("id");
-  });
+  const d3NodeSelection = svgEl
+    .selectAll('[data-graph-type="node"]')
+    .data(nodes, function (d) {
+      return (d && d.id) || d3.select(this).attr("data-graph-id");
+    });
 
   const updatePositions = () => {
-    d3LinkSelection
-      .attr("opacity", 1)
-      .attr("x1", (d) => d.source.x)
-      .attr("y1", (d) => d.source.y)
-      .attr("x2", (d) => d.target.x)
-      .attr("y2", (d) => d.target.y);
+    const positions = nodes.reduce((acc, { id, x, y }) => {
+      acc[id] = { x, y };
+      return acc;
+    }, {});
 
-    d3NodeSelection
-      .attr("opacity", 1)
-      .attr("cx", (d) => d.x)
-      .attr("cy", (d) => d.y);
+    onPositionsChange(positions);
   };
 
   const d3Drag = d3.drag().on("start drag end", (event) => {

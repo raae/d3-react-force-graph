@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import Graph from "../graph";
+import { Graph } from "../graph";
 import { getData } from "../data";
 import { GraphLink, GraphNode } from "../graph-items";
 

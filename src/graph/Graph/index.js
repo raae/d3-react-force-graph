@@ -1,13 +1,22 @@
+import { memo } from "react";
 import { useDimensions } from "./useDimentions";
 import { useData } from "./useData";
 import { useSimulation } from "./useSimulation";
 
-const Graph = ({ data, children }) => {
+// Use memo so graph does not re-render when positions change
+
+const Graph = memo(({ data, children, onPositionsChange }) => {
   console.log("Graph: Render");
 
   const { ref: rootRef, height, width } = useDimensions();
   const { nodes, links } = useData(data);
-  const { simElRef } = useSimulation({ nodes, links, width, height });
+  const { simElRef } = useSimulation({
+    nodes,
+    links,
+    width,
+    height,
+    onPositionsChange,
+  });
 
   return (
     <div
@@ -29,6 +38,6 @@ const Graph = ({ data, children }) => {
       </svg>
     </div>
   );
-};
+});
 
-export default Graph;
+export { Graph };
