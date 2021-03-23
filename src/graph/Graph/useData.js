@@ -1,12 +1,21 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { isEqual } from "lodash";
 
-export const useData = (data) => {
+export const useData = ({ data, onPositionsChange }) => {
   console.log("useData: Run", data.nodes.length);
 
   const dataRef = useRef();
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
+
+  const updatePositions = useCallback(() => {
+    const positions = nodes.reduce((acc, { id, x, y }) => {
+      acc[id] = { x, y };
+      return acc;
+    }, {});
+
+    onPositionsChange(positions);
+  }, [onPositionsChange, nodes]);
 
   useEffect(() => {
     console.log("useData: New data", data.nodes.length);
@@ -34,5 +43,6 @@ export const useData = (data) => {
   return {
     nodes,
     links,
+    updatePositions,
   };
 };

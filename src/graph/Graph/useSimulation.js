@@ -3,10 +3,9 @@ import { useRef, useEffect } from "react";
 import * as d3 from "d3";
 
 export const useSimulation = (props) => {
-  const { nodes, links } = props;
+  const { nodes, links, updatePositions } = props;
   console.log("useSimulation: Run", nodes.length);
 
-  const simElRef = useRef();
   const simRef = useRef();
 
   useEffect(() => {
@@ -21,12 +20,12 @@ export const useSimulation = (props) => {
     updateSimData(simRef.current, props);
   }
 
-  if (simRef.current && simElRef.current) {
-    syncWithDom(simRef.current, simElRef.current, props);
+  if (simRef.current) {
+    syncWithDom(simRef.current, { nodes, updatePositions });
   }
 
   return {
-    simElRef,
+    updatePositions,
   };
 };
 
@@ -52,49 +51,8 @@ const restartSim = (sim, { threshold }) => {
   }
 };
 
-const syncWithDom = (sim, svg, { nodes, onPositionsChange }) => {
+const syncWithDom = (sim, { nodes, updatePositions }) => {
   console.log("useSimulation: Sync with DOM");
-
-  const svgEl = d3.select(svg);
-
-  const d3NodeSelection = svgEl
-    .selectAll('[data-graph-type="node"]')
-    .data(nodes, function (d) {
-      return (d && d.id) || d3.select(this).attr("data-graph-id");
-    });
-
-  const updatePositions = () => {
-    const positions = nodes.reduce((acc, { id, x, y }) => {
-      acc[id] = { x, y };
-      return acc;
-    }, {});
-
-    onPositionsChange(positions);
-  };
-
-  const d3Drag = d3.drag().on("start drag end", (event) => {
-    const { dx, dy, subject } = event;
-    const { id } = subject;
-
-    let draggingIds = [id];
-
-    draggingIds.map((draggingId) => {
-      const node = nodes.find((node) => node.id === draggingId);
-
-      if (node) {
-        node.x = node.x + dx;
-        node.y = node.y + dy;
-        node.fx = node.x;
-        node.fy = node.y;
-      }
-
-      return node;
-    });
-
-    updatePositions();
-  });
-
-  d3NodeSelection.call(d3Drag);
 
   sim.on("tick", () => {
     updatePositions();

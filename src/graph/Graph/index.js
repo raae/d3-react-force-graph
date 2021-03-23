@@ -1,22 +1,24 @@
-import { memo } from "react";
+import { memo, useRef } from "react";
 import { useDimensions } from "./useDimentions";
 import { useData } from "./useData";
 import { useSimulation } from "./useSimulation";
+import { useDrag } from "./useDrag";
+import { useZoom } from "./useZoom";
 
 // Use memo so graph does not re-render when positions change
 
-const Graph = memo(({ data, children, onPositionsChange }) => {
+const Graph = memo(({ children, ...props }) => {
   console.log("Graph: Render");
 
-  const { ref: rootRef, height, width } = useDimensions();
-  const { nodes, links } = useData(data);
-  const { simElRef } = useSimulation({
-    nodes,
-    links,
-    width,
-    height,
-    onPositionsChange,
-  });
+  const ref = useRef();
+  const svgRef = useRef();
+
+  const { nodes, links, updatePositions } = useData(props);
+  useSimulation({ nodes, links, updatePositions });
+
+  useDrag({ svgRef, nodes, updatePositions });
+  const { height, width } = useDimensions({ ref });
+  const { transform } = useZoom({ svgRef });
 
   return (
     <div
@@ -25,16 +27,15 @@ const Graph = memo(({ data, children, onPositionsChange }) => {
         height: "100%",
         background: "floralwhite",
       }}
-      ref={rootRef}
+      ref={ref}
     >
       <svg
         viewBox={`-${width / 2} -${height / 2} ${width} ${height}`}
         width={width}
         height={height}
-        ref={simElRef}
+        ref={svgRef}
       >
-        {children}
-        {/* <g>{children}</g> */}
+        <g transform={transform}>{children}</g>
       </svg>
     </div>
   );
