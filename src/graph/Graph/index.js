@@ -5,14 +5,13 @@ import { useDrag } from "./useDrag";
 import { useZoom } from "./useZoom";
 
 // Use memo so graph does not re-render when positions change
-
 const Graph = memo(({ children, height, width, ...props }) => {
   console.log("Graph: Render");
 
   const svgRef = useRef();
 
-  const { nodes, links, updatePositions } = useData(props);
-  useSimulation({ nodes, links, updatePositions });
+  const { nodes, links, threshold, updatePositions } = useData(props);
+  useSimulation({ nodes, links, threshold, updatePositions });
 
   useDrag({ svgRef, nodes, updatePositions });
 
