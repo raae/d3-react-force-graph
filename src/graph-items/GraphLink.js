@@ -1,14 +1,14 @@
 import { memo } from "react";
-import { useGraphContext } from "../graph";
+import { useGraphState } from "../graph";
 
 // Use memo so graph item does not re-render,
 // on position changes. But moves its position.
 
 const GraphLink = memo(({ id, source, target, value }) => {
-  const pos = useGraphContext() || {};
+  const { positions } = useGraphState() || {};
 
-  const pos1 = pos[source];
-  const pos2 = pos[target];
+  const pos1 = positions[source];
+  const pos2 = positions[target];
 
   const opacity = pos1 && pos2 ? 1 : 0;
   const { x: x1, y: y1 } = pos1 || {};

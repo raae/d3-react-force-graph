@@ -26,7 +26,9 @@ const GraphView = () => {
   // changing data I have added the option ot add/remove
   // three nodes where one even has a fixed position.
 
-  const [isExclude, setIsExclude] = useState(true);
+  const [isExclude, setIsExclude] = useState(
+    Math.random() > 0.5 ? true : false
+  );
 
   const handleToggleExclude = () => {
     setIsExclude((current) => !current);

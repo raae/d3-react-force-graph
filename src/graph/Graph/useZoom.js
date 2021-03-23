@@ -26,5 +26,5 @@ const syncWithDom = (svgEl, { setTransform }) => {
     setTransform(event.transform);
   });
 
-  svg.call(zoom);
+  svg.call(zoom).on("mousedown.zoom", null);
 };

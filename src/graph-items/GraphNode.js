@@ -1,11 +1,11 @@
 import { memo } from "react";
-import { useGraphContext } from "../graph";
+import { useGraphState } from "../graph";
 
 // Use memo so graph item does not re-render,
 // on position changes. But moves its position.
 
 const GraphNode = memo(({ id, fill }) => {
-  const positions = useGraphContext();
+  const { positions } = useGraphState();
 
   const pos = positions[id];
   const opacity = pos ? 1 : 0;

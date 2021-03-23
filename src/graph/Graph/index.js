@@ -4,13 +4,18 @@ import { useSimulation } from "./useSimulation";
 import { useDrag } from "./useDrag";
 import { useZoom } from "./useZoom";
 
-// Use memo so graph does not re-render when positions change
-const Graph = memo(({ children, height, width, ...props }) => {
-  console.log("Graph: Render");
+import { useGraphUpdater } from "../graph-context";
+import { Brush } from "../Brush";
 
+// Use memo so graph does not re-render when positions change
+const Graph = memo(({ children, height, width, data }) => {
+  console.log("Graph: Render", height, width);
+  const { setPositions } = useGraphUpdater();
   const svgRef = useRef();
 
-  const { nodes, links, threshold, updatePositions } = useData(props);
+  const { nodes, links, threshold, updatePositions } = useData(data, {
+    setPositions,
+  });
   useSimulation({ nodes, links, threshold, updatePositions });
 
   useDrag({ svgRef, nodes, updatePositions });
@@ -25,6 +30,12 @@ const Graph = memo(({ children, height, width, ...props }) => {
       ref={svgRef}
     >
       <g transform={transform}>{children}</g>
+      <Brush
+        height={height}
+        width={width}
+        nodes={nodes}
+        onBrushEnd={() => console.log("onBrushEnd")}
+      />
     </svg>
   );
 });
