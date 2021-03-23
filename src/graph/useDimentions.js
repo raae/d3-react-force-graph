@@ -24,5 +24,5 @@ export const useDimensions = (props) => {
     return () => resizeObserver.unobserve(element);
   }, [ref]);
 
-  return { ref, width, height };
+  return { width, height };
 };

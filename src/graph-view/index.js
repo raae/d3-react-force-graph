@@ -9,11 +9,13 @@ const EXCLUDE_IDS = ["Woman2", "Simplice", "Toussaint"];
 const GraphView = () => {
   console.log("GraphView: Render");
 
-  const [data, setData] = useState(getData());
+  const [data, setData] = useState({ links: [], nodes: [] });
 
   useEffect(() => {
     // Faking what would happen when polling an API,
     // to make sure we handle new (but potentially "equal" data).
+    setData(getData());
+
     const id = setInterval(() => {
       setData(getData());
     }, 6000);
