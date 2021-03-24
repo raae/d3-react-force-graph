@@ -20,6 +20,7 @@ export const Graph = ({ children, ...props }) => {
         width: "100%",
         height: "100%",
         background: "floralwhite",
+        position: "relative",
       }}
       ref={ref}
     >

@@ -6,6 +6,7 @@ const GraphUpdaterContext = createContext();
 const GraphProvider = ({ children }) => {
   const [state, setState] = useState({
     positions: {},
+    fixedPositions: {},
     brushedIds: [],
   });
 
@@ -39,6 +40,13 @@ const useGraphUpdater = () => {
     [setState]
   );
 
+  const setFixedPositions = useCallback(
+    (fixedPositions) => {
+      setState((state) => ({ ...state, fixedPositions }));
+    },
+    [setState]
+  );
+
   const setBrushedIds = useCallback(
     (brushedIds) => {
       setState((state) => ({ ...state, brushedIds }));
@@ -46,7 +54,7 @@ const useGraphUpdater = () => {
     [setState]
   );
 
-  return { setPositions, setBrushedIds };
+  return { setPositions, setBrushedIds, setFixedPositions };
 };
 
 export { GraphProvider, useGraphState, useGraphUpdater };

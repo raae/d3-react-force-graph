@@ -1,42 +1,51 @@
-import { memo, useRef } from "react";
-import { useData } from "./useData";
-import { useSimulation } from "./useSimulation";
-import { useDrag } from "./useDrag";
-import { useZoom } from "./useZoom";
+import { memo, useState } from "react";
 
 import { useGraphUpdater } from "../graph-context";
 import { Brush } from "../Brush";
+import { Zoom } from "../Zoom";
+import { Stage } from "../Stage";
+import { Drag } from "../Drag";
+import { Simulation } from "../Simulation";
 
 // Use memo so graph does not re-render when positions change
 const Graph = memo(({ children, height, width, data }) => {
   console.log("Graph: Render", height, width);
-  const { setPositions } = useGraphUpdater();
-  const svgRef = useRef();
 
-  const { nodes, links, threshold, updatePositions } = useData(data, {
-    setPositions,
-  });
-  useSimulation({ nodes, links, threshold, updatePositions });
+  const [brush, setBrush] = useState(false);
 
-  useDrag({ svgRef, nodes, updatePositions });
-
-  const { transform } = useZoom({ svgRef });
+  const { setPositions, setBrushedIds } = useGraphUpdater();
 
   return (
-    <svg
-      viewBox={`-${width / 2} -${height / 2} ${width} ${height}`}
-      width={width}
-      height={height}
-      ref={svgRef}
-    >
-      <g transform={transform}>{children}</g>
-      <Brush
-        height={height}
-        width={width}
-        nodes={nodes}
-        onBrushEnd={() => console.log("onBrushEnd")}
-      />
-    </svg>
+    <>
+      <Stage width={width} height={height}>
+        <Simulation
+          data={data}
+          onPositionsChange={(positions) => setPositions(positions)}
+        >
+          <Zoom mousedownActive={!brush}>{children}</Zoom>
+          <Drag />
+
+          <Brush
+            active={brush}
+            onBrush={(brushedIds) => {
+              setBrushedIds(brushedIds);
+            }}
+            onBrushEnd={() => {
+              setBrush(false);
+            }}
+          />
+        </Simulation>
+      </Stage>
+      <p style={{ position: "absolute", bottom: 0 }}>
+        <input
+          id="brush"
+          type="checkbox"
+          onChange={() => setBrush((current) => !current)}
+          checked={brush}
+        />{" "}
+        <label htmlFor="brush">Brush</label>
+      </p>
+    </>
   );
 });
 
